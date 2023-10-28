@@ -46,3 +46,15 @@ class Island:
             RandomGen.random() * 500,
             RandomGen.randint(0, 300),
         )
+    
+    def value(self):
+        return self.money / self.marines if self.marines != 0 else 0
+
+    def __gt__(self, other):
+        return self.value() > other.value()
+
+    def __lt__(self, other):
+        return self.value() < other.value()
+
+    def __eq__(self, other):
+        return self.value() == other.value()

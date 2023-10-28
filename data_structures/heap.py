@@ -13,6 +13,15 @@ class MaxHeap(Generic[T]):
     def __init__(self, max_size: int) -> None:
         self.length = 0
         self.the_array = ArrayR(max(self.MIN_CAPACITY, max_size) + 1)
+        self.mapping = {}
+        self.saved_states = []
+
+    def save_state(self):
+        self.saved_states.append((self.length, self.the_array[:], self.mapping.copy()))
+
+    def restore_state(self):
+        if self.saved_states:
+            self.length, self.the_array, self.mapping = self.saved_states.pop()
 
     def __len__(self) -> int:
         return self.length
@@ -30,6 +39,7 @@ class MaxHeap(Generic[T]):
             self.the_array[k] = self.the_array[k // 2]
             k = k // 2
         self.the_array[k] = item
+        self.mapping[item] = k
 
     def add(self, element: T) -> bool:
         """
@@ -40,6 +50,7 @@ class MaxHeap(Generic[T]):
 
         self.length += 1
         self.the_array[self.length] = element
+        self.mapping[element] = self.length
         self.rise(self.length)
 
     def largest_child(self, k: int) -> int:
@@ -69,6 +80,7 @@ class MaxHeap(Generic[T]):
             k = max_child
 
         self.the_array[k] = item
+        self.mapping[item] = k
 
     def get_max(self) -> T:
         """ Remove (and return) the maximum element from the heap. """
@@ -76,6 +88,7 @@ class MaxHeap(Generic[T]):
             raise IndexError
 
         max_elt = self.the_array[1]
+        del self.mapping[max_elt]
         self.length -= 1
         if self.length > 0:
             self.the_array[1] = self.the_array[self.length+1]
@@ -88,6 +101,7 @@ class MaxHeap(Generic[T]):
         self.length = len(points)
         for i in range(len(points)):
             self.the_array[i+1] = points[i]
+            self.mapping[points[i]] = i+1
         for k in range(len(points), 0, -1):
             self.sink(k)
         return self
